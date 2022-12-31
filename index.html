@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> + 1 s </title>
+</head>
+
+<body>
+
+    全网通已经续了 &nbsp;
+    <div id="counter-container"></div>
+    &nbsp;秒
+
+    <br>
+
+    你已经续了 &nbsp;
+    <div id="incremention-container"></div>
+    &nbsp;秒
+
+    <br>
+    <br>
+
+    <button id="xu-btn"> 再续 </button>
+    <button id="update_to_db"> 提交 </button>
+
+    <style>
+        #counter-container {
+            display: inline;
+        }
+
+        #incremention-container {
+            display: inline;
+        }
+
+        #update_to_db{
+            display: none;
+        }
+    </style>
+
+    <script>
+
+        let counter_local = 0;
+        let click_count = 0;
+
+        const counter_text = document.getElementById('counter-container');
+        counter_text.innerText = 0;
+        const incremention_text = document.getElementById('incremention-container');
+        incremention_text.innerText = 0;
+        const increment_button = document.getElementById('xu-btn');
+        const update_button = document.getElementById('update_to_db');
+
+        const onClickHandler = () => {
+            console.log('onClickHandler() : click_count: ', click_count);
+            click_count += 1;
+            counter_local += 1;
+            incremention_text.innerText = click_count;
+            counter_text.innerText = counter_local;
+        };
+        increment_button.addEventListener('click', onClickHandler);
+
+
+
+
+        async function updater(url, method, body) {
+            const response = await fetch(url, {
+                method: method, // *GET, POST, PUT, DELETE, etc.
+                mode: 'cors', // no-cors, *cors, same-origin
+                cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+                credentials: 'omit', // include, *same-origin, omit
+                headers: {
+                    // 'Content-Type': 'application/x-www-form-urlencoded',
+                    'Content-Type': 'text/plain',
+                },
+                redirect: 'follow', // manual, *follow, error
+                referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+                body: body && JSON.stringify(body)
+            });
+            if (method === 'GET')
+                return response.json()
+            else
+                return response; // parses JSON response into native JavaScript objects
+        };
+
+        updater('https://1c104v13x0.execute-api.us-east-1.amazonaws.com/v1/counter/1', 'GET', null)
+            .then((data) => {
+                console.log('get/fetched');
+                counter_local = data;
+                counter_text.innerHTML = data;
+            }).catch((error) => {
+                console.error(error);
+            })
+
+
+        window.addEventListener("beforeunload", function (e) {
+            updater('https://1c104v13x0.execute-api.us-east-1.amazonaws.com/v1/counter', 'POST', { count: counter_local, increment: click_count })
+                .then((data) => {
+                    console.log('posted');
+                    counter_text.innerHTML = data;
+                }).catch((error) => {
+                    console.error(error);
+                })
+        }, false);
+
+
+        update_button.addEventListener(
+            'click',
+            () => {
+                console.log('onClickHandler2() :  ');
+                updater('https://1c104v13x0.execute-api.us-east-1.amazonaws.com/v1/counter', 'POST', { "count": counter_local, "increment": click_count })
+                    .then((data) => {
+                        console.log('posted');
+                    }).catch((error) => {
+                        console.error(error);
+                    })
+            }
+        );
+
+
+    </script>
+
+
+</body>
+
+</html>
