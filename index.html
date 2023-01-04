@@ -87,7 +87,7 @@
                 return response; // parses JSON response into native JavaScript objects
         };
 
-        updater('https://1c104v13x0.execute-api.us-east-1.amazonaws.com/v1/counter/1', 'GET', null)
+        updater('https://1c104v13x0.execute-api.us-east-1.amazonaws.com/v1/counter', 'GET', null)
             .then((data) => {
                 console.log('get/fetched');
                 counter_local = data;
